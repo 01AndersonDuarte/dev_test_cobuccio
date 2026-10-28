@@ -11,3 +11,59 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id                String     @id @default(uuid()) @db.Uuid
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  name              String
+  email             String     @unique
+  password          String
+
+  wallets           Wallet?
+  sentTransfers     Transfer[] @relation("SentTransfers")
+  receivedTransfers Transfer[] @relation("ReceivedTransfers")
+
+  @@map("users")
+}
+
+model Wallet {
+  id          String    @id @default(uuid()) @db.Uuid
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  balance     Int       @db.Integer @default(0)
+  userId      String    @unique @db.Uuid
+
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@map("wallets")
+}
+
+model Transfer {
+  id         String   @id @default(uuid()) @db.Uuid
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  amount     Int
+  senderId   String   @db.Uuid
+  receiverId String   @db.Uuid
+
+  sender     User     @relation("SentTransfers", fields: [senderId], references: [id])
+  receiver   User     @relation("ReceivedTransfers", fields: [receiverId], references: [id])
+  reversal   Reversal?
+
+  @@map("transfers")
+}
+
+model Reversal {
+  id         String   @id @default(uuid()) @db.Uuid
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  transferId String   @unique @db.Uuid
+  transfer   Transfer @relation(fields: [transferId], references: [id])
+
+  @@map("reversals")
+}
