@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { UsersRepository } from './users.repository.js';
 import { CreateUserInput } from './inputs/create-user.input.js';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async createUser(userInput: CreateUserInput) {
@@ -18,6 +20,9 @@ export class UsersService {
     }
 
     await this.usersRepository.createUser(userInput);
+    this.logger.log('New user created successfully');
+
+    return;
   }
 
   private async findUserByEmail(email: string) {
