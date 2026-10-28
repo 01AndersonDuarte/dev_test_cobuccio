@@ -16,7 +16,15 @@ async function bootstrap() {
     .setTitle('Wallet API')
     .setDescription('API de carteiras e transferências financeiras')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'bearer',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

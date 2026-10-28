@@ -13,7 +13,9 @@ import type { AuthenticatedUser } from '../../guards/types/authenticated-user.js
 import { AuthGuard } from '../../guards/auth.guard.js';
 import { WalletService } from './wallet.service.js';
 import { WalletResponseDto } from './dto/wallet-response.dto.js';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiBearerAuth('bearer')
 @Controller('wallet')
 @UseGuards(AuthGuard)
 export class WalletController {
@@ -24,6 +26,12 @@ export class WalletController {
   @SerializeOptions({
     type: WalletResponseDto,
     excludeExtraneousValues: true,
+  })
+  @ApiOperation({ summary: 'Get the authenticated user wallet information' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the wallet information of the authenticated user.',
+    type: WalletResponseDto,
   })
   async getMyWallet(@UserDecorator() user: AuthenticatedUser) {
     return await this.walletService.getMyWallet(user);
