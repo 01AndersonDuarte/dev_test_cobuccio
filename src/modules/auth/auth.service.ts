@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 
 import { SigninDto, SignupDto } from './dto/signup.dto.js';
@@ -67,5 +68,14 @@ export class AuthService {
     );
 
     return token;
+  }
+
+  checkToken(token: string): JwtPayload {
+    const data = this.jwtService.verify<JwtPayload>(token, {
+      audience: this.AUDIENCE,
+      issuer: this.ISSUER,
+    });
+
+    return data;
   }
 }
