@@ -25,11 +25,11 @@ export class UsersService {
     return;
   }
 
-  private async findUserByEmail(email: string) {
+  async findUserByEmail(email: string) {
     return await this.usersRepository.findUserByEmail(email);
   }
 
-  private async findUserByCpf(cpf: string) {
+  async findUserByCpf(cpf: string) {
     return await this.usersRepository.findUserByCpf(cpf);
   }
 }
