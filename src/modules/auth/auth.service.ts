@@ -1,10 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
-import { PrismaService } from '../../prisma/prisma.service.js';
+import { SignupDto } from './dto/signup.dto.js';
+import { UsersService } from '../users/users.service.js';
+import { CreateUserInput } from '../users/inputs/create-user.input.js';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  private readonly CRYPT = 10;
 
-  // TODO: create signin and signup methods
+  constructor(private readonly usersService: UsersService) {}
+
+  async signup(newUser: SignupDto) {
+    const newUserInput: CreateUserInput = {
+      ...newUser,
+      password: await bcrypt.hash(newUser.password, this.CRYPT),
+    };
+
+    return await this.usersService.createUser(newUserInput);
+  }
 }

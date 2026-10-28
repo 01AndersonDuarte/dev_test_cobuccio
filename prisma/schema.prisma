@@ -19,6 +19,7 @@ model User {
 
   name              String
   email             String     @unique
+  cpf               String     @unique
   password          String
 
   wallets           Wallet?
