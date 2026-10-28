@@ -9,7 +9,12 @@ export class UsersRepository {
 
   async createUser(userInput: CreateUserInput) {
     return await this.prisma.user.create({
-      data: userInput,
+      data: {
+        ...userInput,
+        wallets: {
+          create: { balance: 0 },
+        },
+      },
     });
   }
 
