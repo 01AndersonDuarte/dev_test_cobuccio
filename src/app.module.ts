@@ -5,6 +5,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { HealthModule } from './modules/health/health.module.js';
+import { WalletModule } from './modules/wallet/wallet.module.js';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { HealthModule } from './modules/health/health.module.js';
     HealthModule,
     PrismaModule,
     AuthModule,
+    WalletModule,
   ],
 })
 export class AppModule {}

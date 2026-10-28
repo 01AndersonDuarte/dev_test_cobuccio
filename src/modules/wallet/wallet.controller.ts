@@ -1,0 +1,36 @@
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Post,
+  SerializeOptions,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+
+import { User as UserDecorator } from '../../decorators/user.decorator.js';
+import type { AuthenticatedUser } from '../../guards/types/authenticated-user.js';
+import { AuthGuard } from '../../guards/auth.guard.js';
+import { WalletService } from './wallet.service.js';
+import { WalletResponseDto } from './dto/wallet-response.dto.js';
+
+@Controller('wallet')
+@UseGuards(AuthGuard)
+export class WalletController {
+  constructor(private readonly walletService: WalletService) {}
+
+  @Get('/me')
+  @UseInterceptors(ClassSerializerInterceptor)
+  @SerializeOptions({
+    type: WalletResponseDto,
+    excludeExtraneousValues: true,
+  })
+  async getMyWallet(@UserDecorator() user: AuthenticatedUser) {
+    return await this.walletService.getMyWallet(user);
+  }
+
+  //   @Post('/deposit')
+  //   async deposit() {
+  //     return await this.walletService.deposit();
+  //   }
+}
