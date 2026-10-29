@@ -11,4 +11,11 @@ export class WalletRepository {
       where: { userId },
     });
   }
+
+  async updateWalletBalance(userId: string, newBalance: number) {
+    return await this.prisma.wallet.update({
+      where: { userId },
+      data: { balance: newBalance },
+    });
+  }
 }

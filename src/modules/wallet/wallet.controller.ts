@@ -1,7 +1,10 @@
 import {
+  Body,
   ClassSerializerInterceptor,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Post,
   SerializeOptions,
   UseGuards,
@@ -14,6 +17,7 @@ import { AuthGuard } from '../../guards/auth.guard.js';
 import { WalletService } from './wallet.service.js';
 import { WalletResponseDto } from './dto/wallet-response.dto.js';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { WalletDepositDto } from './dto/wallet-deposit.dto.js';
 
 @ApiBearerAuth('bearer')
 @Controller('wallet')
@@ -37,8 +41,24 @@ export class WalletController {
     return await this.walletService.getMyWallet(user);
   }
 
-  //   @Post('/deposit')
-  //   async deposit() {
-  //     return await this.walletService.deposit();
-  //   }
+  @Post('/deposit')
+  @HttpCode(HttpStatus.OK)
+  @UseInterceptors(ClassSerializerInterceptor)
+  @SerializeOptions({
+    type: WalletResponseDto,
+    excludeExtraneousValues: true,
+  })
+  @ApiOperation({ summary: 'Deposit funds into the authenticated user wallet' })
+  @ApiResponse({
+    status: 200,
+    description: 'Deposits funds into the authenticated user wallet.',
+    type: WalletResponseDto,
+  })
+  async deposit(
+    @UserDecorator() user: AuthenticatedUser,
+    @Body() depositData: WalletDepositDto,
+  ) {
+    const { amount } = depositData;
+    return await this.walletService.depositToWallet(user, amount);
+  }
 }

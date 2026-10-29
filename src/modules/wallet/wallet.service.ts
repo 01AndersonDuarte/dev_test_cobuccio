@@ -19,4 +19,18 @@ export class WalletService {
 
     return userWallet;
   }
+
+  async depositToWallet(user: AuthenticatedUser, amount: number) {
+    const userWallet = await this.getMyWallet(user);
+    const newBalance = userWallet.balance + amount;
+
+    const updatedWallet = await this.walletRepository.updateWalletBalance(
+      user.id,
+      newBalance,
+    );
+
+    this.logger.log('Wallet balance updated successfully.');
+
+    return updatedWallet;
+  }
 }
