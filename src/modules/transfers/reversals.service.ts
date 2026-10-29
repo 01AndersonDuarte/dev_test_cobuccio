@@ -3,6 +3,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 import { ReversalRepository } from './reversals.repository.js';
@@ -22,9 +23,16 @@ export class ReversalService {
   async reverseTransfer(user: AuthenticatedUser, transferId: string) {
     const transfer = await this.transfersService.getTransferById(transferId);
 
-    if (transfer?.receiverId !== user.id) {
+    if (!transfer) {
       this.logger.warn(`Received transfer not found: ${transferId}`);
       throw new NotFoundException('Transfer not found.');
+    }
+
+    if (transfer?.receiverId !== user.id) {
+      this.logger.warn(`Not authorized to reverse transfer ${transferId}`);
+      throw new UnauthorizedException(
+        'User not authorized to reverse this transfer',
+      );
     }
 
     await this.checkReversalExists(transferId);
