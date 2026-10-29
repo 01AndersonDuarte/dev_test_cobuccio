@@ -12,16 +12,6 @@ export class AuthFactory {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  setEmail(email: string) {
-    this.email = email;
-    return this;
-  }
-
-  setPassword(password: string) {
-    this.password = password;
-    return this;
-  }
-
   build(): SignupDto {
     return {
       name: this.name,
@@ -34,8 +24,8 @@ export class AuthFactory {
   async randomBuild(persist: boolean = false) {
     this.name = faker.person.fullName();
     this.cpf = faker.string.numeric(11);
-    this.setEmail(faker.internet.email());
-    this.setPassword('P4s2word-2tR0ng');
+    this.email = faker.internet.email();
+    this.password = 'P4s2word-2tR0ng';
 
     if (persist) await this.persist();
 

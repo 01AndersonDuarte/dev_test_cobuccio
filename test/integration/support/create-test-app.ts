@@ -1,12 +1,11 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuthModule } from '../../../src/modules/auth/auth.module.js';
-import { PrismaModule } from '../../../src/prisma/prisma.module.js';
+import { AppModule } from '../../../src/app.module.js';
 
 export async function createTestApp(): Promise<INestApplication> {
-  const moduleRef = await Test.createTestingModule({
-    imports: [PrismaModule, AuthModule],
+  const moduleRef: TestingModule = await Test.createTestingModule({
+    imports: [AppModule],
   }).compile();
 
   const app = moduleRef.createNestApplication();
