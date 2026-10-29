@@ -3,13 +3,20 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Transfer } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { CreateTransferInput } from './input/create-transfer.input.js';
+import { AuthenticatedUser } from '../../guards/types/authenticated-user.js';
 
 @Injectable()
 export class TransfersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  findByIdempotencyKey(key: string) {
-    return this.prisma.transfer.findUnique({
+  async getTransferById(transferId: string): Promise<Transfer | null> {
+    return await this.prisma.transfer.findUnique({
+      where: { id: transferId },
+    });
+  }
+
+  async findByIdempotencyKey(key: string): Promise<Transfer | null> {
+    return await this.prisma.transfer.findUnique({
       where: { idempotencyKey: key },
     });
   }

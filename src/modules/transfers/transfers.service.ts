@@ -49,6 +49,10 @@ export class TransfersService {
     }
   }
 
+  async getTransferById(transferId: string) {
+    return await this.transfersRepository.getTransferById(transferId);
+  }
+
   private async verifyTransferIdempotency(
     createdTransfer: CreateTransferInput,
   ) {
