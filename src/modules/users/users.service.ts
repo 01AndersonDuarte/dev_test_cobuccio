@@ -32,4 +32,8 @@ export class UsersService {
   async findUserByCpf(cpf: string) {
     return await this.usersRepository.findUserByCpf(cpf);
   }
+
+  async findUserById(userId: string) {
+    return await this.usersRepository.findUserById(userId);
+  }
 }

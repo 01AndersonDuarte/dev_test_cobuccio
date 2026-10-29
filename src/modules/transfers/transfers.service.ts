@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { TransfersRepository } from './transfers.repository.js';
@@ -10,15 +11,22 @@ import { AuthenticatedUser } from '../../guards/types/authenticated-user.js';
 import { TransferDto } from './dto/transfers.dto.js';
 import { CreateTransferInput } from './input/create-transfer.input.js';
 import { Prisma } from '../../generated/prisma/client.js';
+import { UsersService } from '../users/users.service.js';
 
 @Injectable()
 export class TransfersService {
   private readonly logger = new Logger(TransfersService.name);
 
-  constructor(private readonly transfersRepository: TransfersRepository) {}
+  constructor(
+    private readonly transfersRepository: TransfersRepository,
+    private readonly usersService: UsersService,
+  ) {}
 
   async createTransfer(user: AuthenticatedUser, transferData: TransferDto) {
     const { receiverId } = transferData;
+
+    const receiver = await this.usersService.findUserById(receiverId);
+    if (!receiver) throw new NotFoundException('Invalid receiver user');
 
     if (receiverId === user.id) {
       this.logger.warn('Self-transfer attempt rejected');
