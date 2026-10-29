@@ -1,3 +1,4 @@
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
   Body,
   ClassSerializerInterceptor,
@@ -16,7 +17,6 @@ import type { AuthenticatedUser } from '../../guards/types/authenticated-user.js
 import { AuthGuard } from '../../guards/auth.guard.js';
 import { WalletService } from './wallet.service.js';
 import { WalletResponseDto } from './dto/wallet-response.dto.js';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { WalletDepositDto } from './dto/wallet-deposit.dto.js';
 
 @ApiBearerAuth('bearer')
@@ -36,6 +36,10 @@ export class WalletController {
     status: 200,
     description: 'Returns the wallet information of the authenticated user.',
     type: WalletResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Wallet not found.',
   })
   async getMyWallet(@UserDecorator() user: AuthenticatedUser) {
     return await this.walletService.getMyWallet(user);

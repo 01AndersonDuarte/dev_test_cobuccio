@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { AuthenticatedUser } from '../../guards/types/authenticated-user.js';
 import { WalletRepository } from './wallet.repository.js';
@@ -14,7 +19,7 @@ export class WalletService {
 
     if (!userWallet) {
       this.logger.error('Wallet not found for the user.');
-      throw new BadRequestException('Wallet not found for the user.');
+      throw new NotFoundException('Wallet not found for the user.');
     }
 
     return userWallet;
