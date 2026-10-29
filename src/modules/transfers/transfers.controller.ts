@@ -1,8 +1,15 @@
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
@@ -37,7 +44,7 @@ export class TransfersController {
   @ApiOperation({ summary: 'Make a new transfer' })
   @ApiResponse({
     status: 201,
-    description: 'Transfer completed  successfully.',
+    description: 'Transfer created  successfully.',
   })
   @ApiResponse({
     status: 409,
@@ -51,6 +58,26 @@ export class TransfersController {
   }
 
   @Post('/:id/reversal')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reverses a transfer' })
+  @ApiParam({
+    name: 'id',
+    description: 'Transfer UUID',
+    type: String,
+    format: 'uuid',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Transfer reversal successfully completed',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Transfer not found',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'The transfer has already been reversed',
+  })
   async reverseTransfer(
     @Param('id', new ParseUUIDPipe()) transferId: string,
     @UserDecorator() user: AuthenticatedUser,

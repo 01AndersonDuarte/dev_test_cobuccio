@@ -9,6 +9,7 @@ import { TransfersRepository } from './transfers.repository.js';
 import { AuthenticatedUser } from '../../guards/types/authenticated-user.js';
 import { TransferDto } from './dto/transfers.dto.js';
 import { CreateTransferInput } from './input/create-transfer.input.js';
+import { Prisma } from '../../generated/prisma/client.js';
 
 @Injectable()
 export class TransfersService {
@@ -37,12 +38,17 @@ export class TransfersService {
 
       return transfer;
     } catch (error) {
-      const transfer = await this.verifyTransferIdempotency(createdTransfer);
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        const transfer = await this.verifyTransferIdempotency(createdTransfer);
 
-      if (transfer) {
-        this.logger.log(`Idempotent transfer replay: ${transfer.id}`);
+        if (transfer) {
+          this.logger.log(`Idempotent transfer replay: ${transfer.id}`);
 
-        return transfer;
+          return transfer;
+        }
       }
 
       throw error;
