@@ -71,6 +71,10 @@ export class TransfersController {
     description: 'Transfer reversal successfully completed',
   })
   @ApiResponse({
+    status: 401,
+    description: 'User not authorized to reverse this transfer',
+  })
+  @ApiResponse({
     status: 404,
     description: 'Transfer not found',
   })
