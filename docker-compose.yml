@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    restart: always
+    ports:
+      - 5434:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - dev_test_cobuccio-network
+    volumes:
+      - dev_test_cobuccio-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  dev_test_cobuccio:
+    build: .
+    container_name: dev_test_cobuccio
+    ports:
+      - 5000:3000
+    env_file:
+      - .env
+    networks:
+      - dev_test_cobuccio-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  dev_test_cobuccio-network:
+    name: dev_test_cobuccio-network
+
+volumes:
+  dev_test_cobuccio-volume:
+    name: dev_test_cobuccio-volume
