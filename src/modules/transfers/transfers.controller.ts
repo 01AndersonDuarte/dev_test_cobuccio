@@ -1,9 +1,4 @@
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import {
   Body,
   ClassSerializerInterceptor,
@@ -25,6 +20,10 @@ import { TransfersService } from './transfers.service.js';
 import { TransferResponseDto } from './dto/transfers-response.dto.js';
 import { TransferDto } from './dto/transfers.dto.js';
 import { ReversalService } from './reversals.service.js';
+import {
+  ApiCreateReversal,
+  ApiCreateTransfer,
+} from './decorators/transfers.decorator.js';
 
 @ApiBearerAuth('bearer')
 @Controller('transfers')
@@ -41,15 +40,7 @@ export class TransfersController {
     type: TransferResponseDto,
     excludeExtraneousValues: true,
   })
-  @ApiOperation({ summary: 'Make a new transfer' })
-  @ApiResponse({
-    status: 201,
-    description: 'Transfer created  successfully.',
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'The idempotency key has already been used',
-  })
+  @ApiCreateTransfer()
   async createTransfer(
     @UserDecorator() user: AuthenticatedUser,
     @Body() transferData: TransferDto,
@@ -59,29 +50,7 @@ export class TransfersController {
 
   @Post('/:id/reversal')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Reverses a transfer' })
-  @ApiParam({
-    name: 'id',
-    description: 'Transfer UUID',
-    type: String,
-    format: 'uuid',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Transfer reversal successfully completed',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'User not authorized to reverse this transfer',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Transfer not found',
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'The transfer has already been reversed',
-  })
+  @ApiCreateReversal()
   async reverseTransfer(
     @Param('id', new ParseUUIDPipe()) transferId: string,
     @UserDecorator() user: AuthenticatedUser,

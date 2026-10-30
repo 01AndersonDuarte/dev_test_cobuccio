@@ -18,6 +18,10 @@ import { AuthGuard } from '../../guards/auth.guard.js';
 import { WalletService } from './wallet.service.js';
 import { WalletResponseDto } from './dto/wallet-response.dto.js';
 import { WalletDepositDto } from './dto/wallet-deposit.dto.js';
+import {
+  ApiWalletDeposit,
+  ApiWalletMe,
+} from './decorators/wallet.decorator.js';
 
 @ApiBearerAuth('bearer')
 @Controller('wallet')
@@ -31,16 +35,7 @@ export class WalletController {
     type: WalletResponseDto,
     excludeExtraneousValues: true,
   })
-  @ApiOperation({ summary: 'Get the authenticated user wallet information' })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the wallet information of the authenticated user.',
-    type: WalletResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Wallet not found.',
-  })
+  @ApiWalletMe()
   async getMyWallet(@UserDecorator() user: AuthenticatedUser) {
     return await this.walletService.getMyWallet(user);
   }
@@ -52,12 +47,7 @@ export class WalletController {
     type: WalletResponseDto,
     excludeExtraneousValues: true,
   })
-  @ApiOperation({ summary: 'Deposit funds into the authenticated user wallet' })
-  @ApiResponse({
-    status: 200,
-    description: 'Deposits funds into the authenticated user wallet.',
-    type: WalletResponseDto,
-  })
+  @ApiWalletDeposit()
   async deposit(
     @UserDecorator() user: AuthenticatedUser,
     @Body() depositData: WalletDepositDto,
