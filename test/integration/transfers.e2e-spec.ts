@@ -113,6 +113,19 @@ describe('Transfer (e2e)', () => {
         .expect(HttpStatus.BAD_REQUEST);
     });
 
+    it('POST /transfers => Should respond with status 400 when user has insufficient balance', async () => {
+      const { accessToken } = await createAuthenticatedUser(0);
+      const receiver = await createUser();
+
+      const transfer = await transfersFactory.randomBuild(receiver.userData.id);
+
+      await request(app.getHttpServer())
+        .post('/transfers')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(transfer)
+        .expect(HttpStatus.BAD_REQUEST);
+    });
+
     it('POST /transfers => Should respond with status 404 when receiver does not exist', async () => {
       const { accessToken } = await createAuthenticatedUser();
       const transfer = await transfersFactory.randomBuild(randomUUID());
@@ -210,6 +223,26 @@ describe('Transfer (e2e)', () => {
         .post(`/transfers/${transferId}/reversal`)
         .set('Authorization', `Bearer ${sender.accessToken}`)
         .expect(HttpStatus.UNAUTHORIZED);
+    });
+
+    it('POST /transfers => Should respond with status 400 when user has insufficient balance', async () => {
+      const sender = await createAuthenticatedUser();
+      const receiver = await createAuthenticatedUser(0);
+
+      const { transferId: firstTransferId } = await createTransfer(
+        sender.accessToken,
+        receiver.userData.id,
+      );
+
+      await prisma.wallet.update({
+        where: { userId: receiver.userData.id },
+        data: { balance: 0 },
+      });
+
+      await request(app.getHttpServer())
+        .post(`/transfers/${firstTransferId}/reversal`)
+        .set('Authorization', `Bearer ${receiver.accessToken}`)
+        .expect(HttpStatus.BAD_REQUEST);
     });
 
     it('POST /transfers/:id/reversal => Should respond with status 409 when transfer was already reversed', async () => {
